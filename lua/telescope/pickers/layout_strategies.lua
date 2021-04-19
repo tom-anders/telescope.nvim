@@ -61,38 +61,7 @@
 local config = require('telescope.config')
 local resolve = require("telescope.config.resolve")
 
-local function get_initial_window_options(picker)
-  local popup_border = resolve.win_option(picker.window.border)
-  local popup_borderchars = resolve.win_option(picker.window.borderchars)
-
-  local preview = {
-    title = picker.preview_title,
-    border = popup_border.preview,
-    borderchars = popup_borderchars.preview,
-    enter = false,
-    highlight = false
-  }
-
-  local results = {
-    title = picker.results_title,
-    border = popup_border.results,
-    borderchars = popup_borderchars.results,
-    enter = false,
-  }
-
-  local prompt = {
-    title = picker.prompt_title,
-    border = popup_border.prompt,
-    borderchars = popup_borderchars.prompt,
-    enter = true
-  }
-
-  return {
-    preview = preview,
-    results = results,
-    prompt = prompt,
-  }
-end
+local p_window = require('telescope.pickers.window')
 
 
 -- Check if there are any borders. Right now it's a little raw as
@@ -139,7 +108,7 @@ layout_strategies.horizontal = function(self, max_columns, max_lines)
     scroll_speed = "The speed when scrolling through the previewer",
   })
 
-  local initial_options = get_initial_window_options(self)
+  local initial_options = p_window.get_initial_window_options(self)
   local preview = initial_options.preview
   local results = initial_options.results
   local prompt = initial_options.prompt
@@ -237,7 +206,7 @@ end
 ---    +--------------+
 --- </pre>
 layout_strategies.center = function(self, columns, lines)
-  local initial_options = get_initial_window_options(self)
+  local initial_options = p_window.get_initial_window_options(self)
   local preview = initial_options.preview
   local results = initial_options.results
   local prompt = initial_options.prompt
@@ -307,7 +276,7 @@ layout_strategies.vertical = function(self, max_columns, max_lines)
     scroll_speed = "The speed when scrolling through the previewer",
   })
 
-  local initial_options = get_initial_window_options(self)
+  local initial_options = p_window.get_initial_window_options(self)
   local preview = initial_options.preview
   local results = initial_options.results
   local prompt = initial_options.prompt
@@ -444,6 +413,33 @@ layout_strategies.current_buffer = function(self, _, _)
     preview = preview.width > 0 and preview,
     results = results,
     prompt = prompt,
+  }
+end
+
+layout_strategies.bottom_pane = function(self, max_columns, max_lines)
+  local layout_config = validate_layout_config(self.layout_config or {}, {
+    height = "The height of the layout",
+  })
+
+  local initial_options = p_window.get_initial_window_options(self)
+  local results = initial_options.results
+  local prompt = initial_options.prompt
+
+  local result_height = layout_config.height or 25
+  return {
+    preview = nil,
+    prompt = vim.tbl_deep_extend("force", prompt, {
+      line = max_lines - result_height - 1,
+      col = 0,
+      height = 1,
+      width = max_columns,
+    }),
+    results = vim.tbl_deep_extend("force", results, {
+      line = max_lines - result_height,
+      col = 0,
+      height = result_height,
+      width = max_columns,
+    }),
   }
 end
 

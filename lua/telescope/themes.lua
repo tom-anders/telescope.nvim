@@ -2,7 +2,6 @@
 -- Currently certain designs need a number of parameters.
 --
 -- local opts = themes.get_dropdown { winblend = 3 }
---
 
 local themes = {}
 
@@ -29,6 +28,20 @@ function themes.get_dropdown(opts)
   }
 
   return vim.tbl_deep_extend("force", theme_opts, opts)
+end
+
+function themes.get_ivy(opts)
+  opts = opts or {}
+
+  return vim.tbl_deep_extend("force", {
+    layout_strategy = 'bottom_pane',
+    layout_config = {
+      height = 10,
+    },
+
+    border = false,
+    -- TODO: Make only top border?
+  }, opts)
 end
 
 return themes
