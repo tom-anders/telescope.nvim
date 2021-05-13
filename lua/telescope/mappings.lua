@@ -28,6 +28,7 @@ mappings.default_mappings = config.values.default_mappings or {
       ["<S-Tab>"] = actions.toggle_selection + actions.move_selection_better,
       ["<C-q>"] = actions.send_to_qflist + actions.open_qflist,
       ["<M-q>"] = actions.send_selected_to_qflist + actions.open_qflist,
+      ["<C-a>"] = actions.add_selected_to_arglist,
       ["<C-l>"] = actions.complete_tag
     },
 
@@ -42,6 +43,7 @@ mappings.default_mappings = config.values.default_mappings or {
       ["<S-Tab>"] = actions.toggle_selection + actions.move_selection_better,
       ["<C-q>"] = actions.send_to_qflist + actions.open_qflist,
       ["<M-q>"] = actions.send_selected_to_qflist + actions.open_qflist,
+      ["<C-a>"] = actions.add_selected_to_arglist,
 
       -- TODO: This would be weird if we switch the ordering.
       ["j"] = actions.move_selection_next,

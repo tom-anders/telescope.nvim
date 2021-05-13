@@ -506,6 +506,27 @@ actions.smart_add_to_qflist = function(prompt_bufnr)
   smart_send(prompt_bufnr, 'a')
 end
 
+actions.remove_selected_from_arglist = function(prompt_bufnr)
+  local picker = action_state.get_current_picker(prompt_bufnr)
+
+  for _, entry in ipairs(picker:get_multi_selection()) do
+    vim.cmd('argdelete ' .. entry.filename)
+  end
+end
+
+actions.add_selected_to_arglist = function(prompt_bufnr)
+  local picker = action_state.get_current_picker(prompt_bufnr)
+
+  local argv = vim.fn.argv()
+  for _, entry in ipairs(picker:get_multi_selection()) do
+    -- For some reason, vim's argadd does not check for duplicates,
+    -- so we have to take care of it by ourselves
+    if not vim.tbl_contains(argv, entry.filename) then
+        vim.cmd('argadd ' .. entry.filename)
+    end
+  end
+end
+
 actions.complete_tag = function(prompt_bufnr)
   local current_picker = action_state.get_current_picker(prompt_bufnr)
   local tags = current_picker.sorter.tags

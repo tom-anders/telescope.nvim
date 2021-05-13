@@ -428,23 +428,26 @@ function make_entry.gen_from_lsp_symbols(opts)
   end
 end
 
-function make_entry.gen_from_buffer(opts)
-  opts = opts or {}
-
-  local disable_devicons = opts.disable_devicons
-
+function get_dev_icon_width(disable_devicons)
   local icon_width = 0
   if not disable_devicons then
     local icon, _ = utils.get_devicons('fname', disable_devicons)
     icon_width = utils.strdisplaywidth(icon)
   end
+  return icon_width
+end
+
+function make_entry.gen_from_buffer(opts)
+  opts = opts or {}
+
+  local disable_devicons = opts.disable_devicons
 
   local displayer = entry_display.create {
     separator = " ",
     items = {
       { width = opts.bufnr_width },
       { width = 4 },
-      { width = icon_width },
+      { width = get_dev_icon_width(disable_devicons) },
       { remaining = true },
     },
   }
@@ -491,6 +494,42 @@ function make_entry.gen_from_buffer(opts)
 
       lnum = entry.info.lnum ~= 0 and entry.info.lnum or 1,
       indicator = indicator,
+    }
+  end
+end
+
+function make_entry.gen_from_arg_list(opts)
+  opts = opts or {}
+
+  local disable_devicons = opts.disable_devicons
+  local displayer = entry_display.create {
+    separator = " ",
+    items = {
+      {width = get_dev_icon_width(disable_devicons)},
+      {remaining = true},
+    },
+  }
+
+  local make_display = function(entry)
+    local icon, hl_group = utils.get_devicons(entry.filename, disable_devicons)
+    return displayer {
+      {icon, hl_group},
+      entry.filename,
+    }
+  end
+
+  return function(entry)
+    return {
+      valid = true,
+
+      value = entry.filename,
+      ordinal = entry.filename,
+      display = make_display,
+
+      bufnr = entry.bufnr,
+      filename = entry.filename,
+
+      lnum = entry.lnum,
     }
   end
 end

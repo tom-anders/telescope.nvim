@@ -54,6 +54,7 @@ builtin.help_tags = require('telescope.builtin.internal').help_tags
 builtin.man_pages = require('telescope.builtin.internal').man_pages
 builtin.reloader = require('telescope.builtin.internal').reloader
 builtin.buffers = require('telescope.builtin.internal').buffers
+builtin.arglist = require('telescope.builtin.internal').arglist
 builtin.colorscheme = require('telescope.builtin.internal').colorscheme
 builtin.marks = require('telescope.builtin.internal').marks
 builtin.registers = require('telescope.builtin.internal').registers

@@ -616,6 +616,58 @@ internal.buffers = function(opts)
   }):find()
 end
 
+internal.arglist = function(opts)
+  opts = opts or {}
+
+  local make_finder = function()
+    local entries = {}
+    for _, arg in pairs(vim.fn.argv()) do
+      local bufnr = vim.fn.bufnr(arg) 
+      table.insert(entries, {
+        filename = arg,
+        bufnr = bufnr,
+        lnum = vim.fn.getbufinfo(bufnr)[1].lnum,
+      })
+    end
+
+    if vim.tbl_isempty(entries) then
+      print("Arglist is empty!")
+      return
+    end
+
+    return finders.new_table {
+      results = entries,
+      entry_maker = opts.entry_maker or make_entry.gen_from_arg_list(opts),
+    }
+  end
+
+  local initial_finder = make_finder()
+  if not initial_finder then return end
+
+  pickers.new(opts, {
+    prompt_title = opts.prompt_title or 'arglist',
+    finder = initial_finder,
+    previewer = conf.grep_previewer(opts),
+    sorter = conf.generic_sorter(opts),
+    attach_mappings = function(prompt_bufnr)
+
+      -- Refresh our picker when items are removed from the list
+      actions.remove_selected_from_arglist:enhance {
+        post = function()
+          local new_finder = make_finder()
+          if new_finder then
+            action_state.get_current_picker(prompt_bufnr):refresh(new_finder)
+          else -- Deleted all remaining entries
+            actions.close(prompt_bufnr)
+          end
+        end,
+      }
+
+      return true
+    end
+  }):find()
+end
+
 internal.colorscheme = function(opts)
   local colors = vim.list_extend(opts.colors or {}, vim.fn.getcompletion('', 'color'))
 
